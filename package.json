@@ -1,0 +1,19 @@
+{
+  "name": "employee_database_assignment",
+  "version": "1.0.0",
+  "description": "Taking Weekend Challenge 1 and adding database for employee data.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/server.js"
+  },
+  "author": "Aaron R McGrath",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "bootstrap": "^3.3.6",
+    "express": "^4.13.4",
+    "jquery": "^2.2.2",
+    "path": "^0.12.7"
+  }
+}
