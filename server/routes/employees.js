@@ -84,5 +84,41 @@ router.get('/get', function(req,res) {
   });
 });
 
+router.delete('/delete', function(req,res) {
+  console.log(req.body.employeeindex);
+  var deleteEmp = {
+    employeeid: req.body.employeeindex
+  };
+  console.log('DELETE successful, here is info:', deleteEmp);
+  pg.connect(connectionString, function(err, client, done){
+    var query = client.query('DELETE FROM employees WHERE employee_id = ' + deleteEmp.employeeid + ';',
+    function(err, result){
+      done();
+
+      if(err){
+        console.log('Error inserting data: ', err);
+        res.send(false);
+      } else {
+        res.send(result);
+        // console.log('*** Here is DELETE result: ', result);
+      }
+    });
+
+    // query.on('row', function(row) {
+    //   results.push(row);
+    // });
+    //
+    // query.on('end', function(){
+    //   done();
+    //   return res.json(results);
+    //   console.log('Delete query = ', results);
+    // });
+
+    if(err) {
+      console.log(err);
+    }
+  });
+});
+
 
 module.exports = router;

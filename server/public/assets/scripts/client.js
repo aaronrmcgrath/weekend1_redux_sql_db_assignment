@@ -4,10 +4,10 @@
 
 $(document).ready(function(){
 
-  getEmployee();
+  getEmployees();
   getSalary();
   $('#employeeForm').on('submit', processEmployee);
-  $('.employee-info').on('mouseup', '.remove', removeSalary);
+  $('.employee-info').on('mouseup', '.remove', removeEmployee);
 
 });
 
@@ -38,14 +38,14 @@ function processEmployee() {
     url: '/employees/add',
     data: employee,
     success: function() {
-      console.log('POST success! Here is info sent: ', employee);
-      getEmployee();
+      // console.log('POST success! Here is info sent: ', employee);
+      getEmployees();
       getSalary();
 
     }
   });
 
-  // getEmployee();
+  // getEmployees();
 
   // calTotalSalary();
   // console.log(employeeArray);
@@ -57,13 +57,13 @@ function processEmployee() {
 
 
 //GET call to retrieve employee object from DB and process appendEmployeeDom
-function getEmployee(){
+function getEmployees(){
 
   $.ajax({
     type: 'GET',
     url: '/employees/get',
     success: function(data){
-      console.log('GET successfully processed: ', data);
+      // console.log('GET successfully processed: ', data);
       appendEmployeeDom(data);
     }
   });
@@ -74,7 +74,7 @@ function appendEmployeeDom(employeeArray) {
 
   $('.employee-info').empty();
 
-  console.log('Employee Array after Get before Append: ', employeeArray);
+  // console.log('Employee Array after Get before Append: ', employeeArray);
   for(var i = 0; i < employeeArray.length; i++){
 
     $('.employee-info').append('<div class="employee ' + employeeArray[i].employee_id + '"></div>');
@@ -99,10 +99,26 @@ function getSalary(){
     type: 'GET',
     url: '/employees/get',
     success: function(data){
-      console.log('GET Salary processed: ', data);
+      // console.log('GET Salary processed: ', data);
       calTotalSalary(data);
     }
   });
+}
+
+//DELETE info from DB, will run in the removeEmployee function
+function deleteEmployee(value) {
+
+  $.ajax({
+    type: 'DELETE',
+    url: '/employees/delete',
+    data: value,
+    success: function(value) {
+    // console.log('Employee deleted: ', value);
+    getEmployees();
+    getSalary();
+  }
+  });
+
 }
 
 //The calTotalSalary function calculates the all of the employees' salaries and converts it to monthly
@@ -112,13 +128,13 @@ function calTotalSalary (employeeArray) {
   var totMonthSalary = 0;
   for (var i = 0; i < employeeArray.length; i++){
     var empSalary = employeeArray[i].base_salary;
-    console.log(empSalary, totMonthSalary);
+    // console.log(empSalary, totMonthSalary);
     totMonthSalary += parseInt(empSalary) / 12;
-    console.log('totMonthSalary = ', totMonthSalary);
+    // console.log('totMonthSalary = ', totMonthSalary);
   }
   combinedMonthlySalary = totMonthSalary;
   // return combinedMonthlySalary;
-  console.log(totMonthSalary);
+  // console.log(totMonthSalary);
   displaySalary();
 }
 
@@ -134,7 +150,10 @@ function displaySalary() {
 
 
 //Removes the current employee from html page
-function removeSalary(){
+function removeEmployee(){
+  var value = $(this).data();
+  console.log('Here is the deleted items data: ', value);
+  deleteEmployee(value);
   $(this).parent().remove();
 }
 
