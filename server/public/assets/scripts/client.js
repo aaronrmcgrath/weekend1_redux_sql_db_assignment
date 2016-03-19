@@ -3,9 +3,10 @@
 //jQuery interaction for the employeeForm
 
 $(document).ready(function(){
+
   getEmployee();
+  getSalary();
   $('#employeeForm').on('submit', processEmployee);
-  calTotalSalary();
   $('.employee-info').on('mouseup', '.remove', removeSalary);
 
 });
@@ -15,7 +16,7 @@ $(document).ready(function(){
 //employeeArray will be the Array that the employee objects are stored
 //combinedMonthlySalary is where the total monthly salary of all employees is stored
 
-var employeeArray = [];
+// var employeeArray = [];
 var combinedMonthlySalary = 0;
 var i = 0;
 // var totMonthSalary = 0;
@@ -30,7 +31,7 @@ function processEmployee() {
     employee[field.name] = field.value;
   });
 
-  employeeArray.push(employee);
+  // employeeArray.push(employee);
 
   $.ajax({
     type: 'POST',
@@ -38,19 +39,24 @@ function processEmployee() {
     data: employee,
     success: function() {
       console.log('POST success! Here is info sent: ', employee);
+      getEmployee();
+      getSalary();
+
     }
   });
 
-  getEmployee();
+  // getEmployee();
 
   // calTotalSalary();
-  console.log(employeeArray);
+  // console.log(employeeArray);
 
 
   $('#employeeForm').find('input[type=text]').val('');
   // console.log('!');
 }
 
+
+//GET call to retrieve employee object from DB and process appendEmployeeDom
 function getEmployee(){
 
   $.ajax({
@@ -58,39 +64,57 @@ function getEmployee(){
     url: '/employees/get',
     success: function(data){
       console.log('GET successfully processed: ', data);
-      // data.forEach(appendEmployeeDom);
+      appendEmployeeDom(data);
     }
-      });
+  });
 }
 
 //AppendEmployeedom Function
 function appendEmployeeDom(employeeArray) {
-  $('.employees').empty();
 
-  $('.employee-info').append('<div class="employees"></div>');
+  $('.employee-info').empty();
 
-  // for()
+  console.log('Employee Array after Get before Append: ', employeeArray);
+  for(var i = 0; i < employeeArray.length; i++){
 
-  var $el = $('.employee-info').children().last();
-  // var $removeEl = $('.employee-info')
-  $el.data('myIndex', i);
+    $('.employee-info').append('<div class="employee ' + employeeArray[i].employee_id + '"></div>');
+    var $el = $('.employee-info').children().last();
+    // var $removeEl = $('.employee-info')
+    // $el.data('myIndex', employ);
 
-  $el.append('<p>Employee: ' + employees.firstname + ' ' + employees.lastname + '</p>');
-  $el.append('<p>Employee ID: ' + employees.employeeid + '</p>');
-  $el.append('<p>Job Title: ' + employees.jobtitle + '</p>');
-  $el.append('<p>Annual Salary: ' + employees.salary + '</p>');
+    $el.append('<p>Employee: ' + employeeArray[i].first_name + ' ' + employeeArray[i].last_name + '</p>');
+    $el.append('<p>Employee ID: ' + employeeArray[i].employee_id + '</p>');
+    $el.append('<p>Job Title: ' + employeeArray[i].position + '</p>');
+    $el.append('<p>Annual Salary: ' + employeeArray[i].base_salary + '</p>');
 
-  $el.append('<button class="remove">Remove</button>');
+    $el.append('<button class="remove" data-employeeIndex=' + employeeArray[i].employee_id + '>Remove</button>');
+  }
 
 }
 
+//GET to pull employee object from DB to process calTotalSalary to append total monthly salary to DOM.
+function getSalary(){
+
+  $.ajax({
+    type: 'GET',
+    url: '/employees/get',
+    success: function(data){
+      console.log('GET Salary processed: ', data);
+      calTotalSalary(data);
+    }
+  });
+}
 
 //The calTotalSalary function calculates the all of the employees' salaries and converts it to monthly
-function calTotalSalary () {
+
+function calTotalSalary (employeeArray) {
+
   var totMonthSalary = 0;
   for (var i = 0; i < employeeArray.length; i++){
-    var empSalary = employeeArray[i];
-    totMonthSalary += parseInt(empSalary.salary) / 12;
+    var empSalary = employeeArray[i].base_salary;
+    console.log(empSalary, totMonthSalary);
+    totMonthSalary += parseInt(empSalary) / 12;
+    console.log('totMonthSalary = ', totMonthSalary);
   }
   combinedMonthlySalary = totMonthSalary;
   // return combinedMonthlySalary;
@@ -112,8 +136,6 @@ function displaySalary() {
 //Removes the current employee from html page
 function removeSalary(){
   $(this).parent().remove();
-  // reCalTotalSalary();
-  console.log(employeeArray);
 }
 
 /*function delEmployeeObj() {

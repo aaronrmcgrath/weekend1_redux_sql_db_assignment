@@ -21,6 +21,7 @@ pg.connect(connectionString, function(err, client, done){
     'first_name varchar(80) NOT NULL,' +
     'last_name varchar(80) NOT NULL,' +
     'employee_id int NOT NULL,' +
+    'position varchar(80),' +
     'base_salary int NOT NULL);'
   );
   query.on('end', function() {
@@ -41,14 +42,15 @@ router.post('/add', function(req, res) {
     firstname: req.body.firstname,
     lastname: req.body.lastname,
     employeeid: req.body.employeeid,
+    position: req.body.position,
     salary: req.body.salary
   };
   console.log('POST successful, here is info:', addEmployee);
 
   pg.connect(connectionString, function(err, client, done){
-    client.query('INSERT INTO employees (first_name, last_name, employee_id, base_salary)' +
-    'VALUES($1, $2, $3, $4) RETURNING id',
-    [addEmployee.firstname, addEmployee.lastname, addEmployee.employeeid, addEmployee.salary],
+    client.query('INSERT INTO employees (first_name, last_name, employee_id, position, base_salary)' +
+    'VALUES($1, $2, $3, $4, $5) RETURNING id',
+    [addEmployee.firstname, addEmployee.lastname, addEmployee.employeeid, addEmployee.position, addEmployee.salary],
     function(err, result){
       done();
 
